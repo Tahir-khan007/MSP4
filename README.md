@@ -57,7 +57,7 @@ The application follows a clean, intuitive design pattern with modal-based inter
 
 **User Story 3**: *"As a first-time user, I want to see my dashboard immediately after logging in so I understand the interface."*
 
-![Empty Dashboard](./screenshots/empty-dashboard.png)
+![Empty Dashboard](./screenshots/dashboard-overview.png)
 *Clean dashboard view for new users with clear call-to-actions to add first transaction*
 
 **User Story 4**: *"As a first-time user, I want to add my first category easily so I can start organizing my transactions."*
