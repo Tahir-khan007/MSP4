@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Payment Cancelled - Finance Tracker{% endblock %}
+
+{% block content %}
+<div class="form-container" style="text-align: center;">
+    <div class="cancel-icon">✕</div>
+    <h2>Payment Cancelled</h2>
+    <p>Your payment was cancelled. No charges were made.</p>
+    <p>You can try again anytime when you're ready to upgrade.</p>
+
+    <div class="cancel-actions">
+        <a href="{% url 'payments:upgrade' %}" class="btn btn-primary">Try Again</a>
+        <a href="{% url 'dashboard:home' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
+<style>
+    .cancel-icon {
+        font-size: 80px;
+        color: #f44336;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}

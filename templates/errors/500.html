@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - Finance Tracker{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <h1>500</h1>
+    <h2>Server Error</h2>
+    <p>Sorry, something went wrong on our end. Please try again later.</p>
+
+    <div class="error-suggestions">
+        <h3>What you can try:</h3>
+        <ul>
+            <li>Refresh the page</li>
+            <li>Clear your browser cache</li>
+            <li>Try again in a few minutes</li>
+        </ul>
+    </div>
+
+    <div class="error-actions">
+        <a href="{% url 'home' %}" class="btn btn-primary">Go to Home</a>
+        <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
+    </div>
+</div>
+
+<style>
+    .error-page {
+        text-align: center;
+        padding: 100px 20px;
+        color: white;
+    }
+    .error-page h1 {
+        font-size: 120px;
+        margin: 0;
+        opacity: 0.8;
+    }
+    .error-page h2 {
+        font-size: 32px;
+        margin: 20px 0;
+    }
+    .error-page p {
+        font-size: 18px;
+        margin-bottom: 30px;
+        opacity: 0.9;
+    }
+    .error-suggestions {
+        background: rgba(255,255,255,0.1);
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 400px;
+        margin: 0 auto 30px;
+    }
+    .error-suggestions ul {
+        list-style: none;
+        padding: 0;
+        text-align: left;
+    }
+    .error-suggestions li {
+        padding: 5px 0;
+    }
+    .error-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Finance Tracker{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Your Profile</h2>
+
+    <div class="profile-info">
+        <div class="profile-field">
+            <label>Username:</label>
+            <span>{{ user.username }}</span>
+        </div>
+
+        <div class="profile-field">
+            <label>Email:</label>
+            <span>{{ user.email }}</span>
+        </div>
+
+        <div class="profile-field">
+            <label>Member Since:</label>
+            <span>{{ user.created_at|date:"F d, Y" }}</span>
+        </div>
+
+        <div class="profile-field">
+            <label>Account Type:</label>
+            {% if user.has_active_premium %}
+                <span class="premium-status">Premium (until {{ user.premium_until|date:"F d, Y" }})</span>
+            {% else %}
+                <span class="free-status">Free</span>
+                <a href="{% url 'payments:upgrade' %}" class="btn btn-primary btn-small">Upgrade to Premium</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

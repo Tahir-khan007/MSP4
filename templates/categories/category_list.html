@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Categories - Finance Tracker{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <div class="category-header">
+        <h2>Manage Categories</h2>
+        <div class="filter-group">
+            <button id="addCategoryBtn" onclick="openAddCategoryModal()">Add Category</button>
+        </div>
+    </div>
+
+    <section class="categories-section">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category Name</th>
+                        <th>Transactions</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if category_data %}
+                    {% for item in category_data %}
+                    <tr>
+                        <td><strong>{{ item.category.name }}</strong></td>
+                        <td>
+                            {% if item.transaction_count > 0 %}
+                            <span class="transaction-badge">{{ item.transaction_count }} transaction(s)</span>
+                            {% else %}
+                            <span class="no-transactions" style="color: #666; font-style: italic;">No
+                                transactions</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.category.created_at|date:"Y-m-d" }}</td>
+                        <td>
+                            <a href="javascript:void(0)"
+                                onclick="openEditCategoryModal({{ item.category.id }}, '{{ item.category.name|escapejs }}')"
+                                class="action-link">Edit</a>
+                            <form method="POST" action="{% url 'categories:delete' item.category.id %}"
+                                style="display: inline;" id="delete-form-{{ item.category.id }}">
+                                {% csrf_token %}
+                                <button type="button" class="delete-btn"
+                                    onclick="confirmDelete('{{ item.category.name|escapejs }}', {{ item.transaction_count }}, 'delete-form-{{ item.category.id }}')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align:center;">No categories found. Click "Add Category" to create
+                            your first category.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<!-- Add Category Modal -->
+<div id="addCategoryModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Category</h2>
+            <span class="close" onclick="closeAddCategoryModal()">&times;</span>
+        </div>
+        <form method="POST" action="{% url 'categories:add' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="add_category_name">Category Name</label>
+                <input type="text" id="add_category_name" name="name" class="form-control"
+                    placeholder="e.g., Salary, Groceries, Rent" required maxlength="50">
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="btn btn-primary">Add Category</button>
+                <button type="button" class="btn btn-secondary" onclick="closeAddCategoryModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div id="editCategoryModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Category</h2>
+            <span class="close" onclick="closeEditCategoryModal()">&times;</span>
+        </div>
+        <form method="POST" id="editCategoryForm">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="edit_category_name">Category Name</label>
+                <input type="text" id="edit_category_name" name="name" class="form-control" required maxlength="50">
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="btn btn-primary">Update Category</button>
+                <button type="button" class="btn btn-secondary" onclick="closeEditCategoryModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add Category Modal Functions
+    function openAddCategoryModal() {
+        const modal = document.getElementById('addCategoryModal');
+        modal.style.display = 'flex';
+    }
+
+    function closeAddCategoryModal() {
+        const modal = document.getElementById('addCategoryModal');
+        modal.style.display = 'none';
+        modal.querySelector('form').reset();
+    }
+
+    // Edit Category Modal Functions
+    function openEditCategoryModal(id, name) {
+        const modal = document.getElementById('editCategoryModal');
+        const form = document.getElementById('editCategoryForm');
+
+        // Set form action to the edit URL
+        form.action = `/categories/edit/${id}/`;
+
+        // Populate form field
+        document.getElementById('edit_category_name').value = name;
+
+        modal.style.display = 'flex';
+    }
+
+    function closeEditCategoryModal() {
+        const modal = document.getElementById('editCategoryModal');
+        modal.style.display = 'none';
+        modal.querySelector('form').reset();
+    }
+
+    // Enhanced delete confirmation
+    function confirmDelete(categoryName, transactionCount, formId) {
+        if (transactionCount > 0) {
+            // Show alert (not confirm) and prevent deletion
+            alert(
+                `❌ Cannot Delete Category "${categoryName}"\n\n` +
+                `This category has ${transactionCount} transaction(s) linked to it.\n\n` +
+                `To delete this category, you must first:\n` +
+                `1. Go to Dashboard\n` +
+                `2. Delete or reassign all transactions from this category\n` +
+                `3. Then come back and delete the category`
+            );
+            return false;
+        } else {
+            // Safe to delete, show confirmation
+            if (confirm(`Are you sure you want to delete the category "${categoryName}"?`)) {
+                document.getElementById(formId).submit();
+            }
+        }
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function (event) {
+        const addModal = document.getElementById('addCategoryModal');
+        const editModal = document.getElementById('editCategoryModal');
+
+        if (event.target === addModal) {
+            closeAddCategoryModal();
+        }
+        if (event.target === editModal) {
+            closeEditCategoryModal();
+        }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeAddCategoryModal();
+            closeEditCategoryModal();
+        }
+    });
+</script>
+{% endblock %}

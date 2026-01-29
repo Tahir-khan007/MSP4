@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Upgrade to Premium - Finance Tracker{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 600px;">
+    <h2>Upgrade to Premium</h2>
+
+    {% if user.has_active_premium %}
+    <div class="premium-active">
+        <h3>You're Already Premium!</h3>
+        <p>Your premium subscription is active until {{ user.premium_until|date:"F d, Y" }}.</p>
+        <a href="{% url 'dashboard:home' %}" class="btn btn-primary">Go to Dashboard</a>
+    </div>
+    {% else %}
+    <div class="upgrade-info">
+        <div class="current-plan">
+            <h3>Current Plan: Free</h3>
+            <ul>
+                <li>Up to 10 transactions</li>
+                <li>Up to 5 categories</li>
+                <li>Basic dashboard</li>
+            </ul>
+        </div>
+
+        <div class="premium-plan">
+            <h3>Premium Plan - £{{ premium_price }}/year</h3>
+            <ul>
+                <li>✓ Unlimited transactions</li>
+                <li>✓ Unlimited categories</li>
+                <li>✓ Advanced analytics (coming soon)</li>
+                <li>✓ Export data to CSV (coming soon)</li>
+                <li>✓ Priority support</li>
+            </ul>
+
+            <button id="checkout-button" class="btn btn-primary btn-large">
+                Upgrade Now - £{{ premium_price }}
+            </button>
+            <p class="secure-note">Secure payment powered by Stripe</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if not user.has_active_premium %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe('{{ stripe_public_key }}');
+
+    document.getElementById('checkout-button').addEventListener('click', function() {
+        this.disabled = true;
+        this.textContent = 'Processing...';
+
+        fetch('{% url "payments:create_checkout" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+        })
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(session) {
+            if (session.error) {
+                alert(session.error);
+                document.getElementById('checkout-button').disabled = false;
+                document.getElementById('checkout-button').textContent = 'Upgrade Now - £{{ premium_price }}';
+            } else {
+                return stripe.redirectToCheckout({ sessionId: session.id });
+            }
+        })
+        .catch(function(error) {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+            document.getElementById('checkout-button').disabled = false;
+            document.getElementById('checkout-button').textContent = 'Upgrade Now - £{{ premium_price }}';
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}
