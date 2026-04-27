@@ -1,4 +1,4 @@
-# 💰 Finance Tracker 
+# 💰 Finance Tracker
 
 A full-stack Django web application for personal finance management with Stripe payment integration for premium subscriptions. Track your income and expenses, manage custom categories, and visualize your financial health through interactive charts—all with a clean, responsive interface.
 
